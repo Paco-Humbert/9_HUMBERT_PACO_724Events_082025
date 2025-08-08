@@ -1,4 +1,3 @@
-// src/containers/Slider/index.test.js
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import Slider from "./index";

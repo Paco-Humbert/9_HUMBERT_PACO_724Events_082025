@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useData } from "../../contexts/DataContext";
 import { getMonth } from "../../helpers/Date";
 
@@ -6,30 +6,33 @@ import "./style.scss";
 
 const Slider = () => {
   const { data } = useData();
-  const [index, setIndex] = useState(0);
-  const byDateDesc = data?.focus.sort((evtA, evtB) =>
-    new Date(evtA.date) < new Date(evtB.date) ? -1 : 1
+
+  // 1) TOUJOURS un tableau + tri DESC (récent -> ancien)
+  const byDateDesc = (data?.focus ?? []).sort(
+    (evtA, evtB) => new Date(evtB.date) - new Date(evtA.date)
   );
-  const nextCard = () => {
-    setTimeout(
-      () => setIndex(index < byDateDesc.length ? index + 1 : 0),
-      5000
-    );
-  };
+
+  const [index, setIndex] = useState(0);
+
+  // 2) Auto-advance un seul timer + modulo (jamais hors-borne)
   useEffect(() => {
-    nextCard();
-  });
+    if (byDateDesc.length === 0) return () => {};
+    const id = setTimeout(() => {
+      setIndex((i) => (i + 1) % byDateDesc.length);
+    }, 5000);
+    return () => clearTimeout(id);
+}, [index, byDateDesc.length]);
+
   return (
     <div className="SlideCardList">
-      {byDateDesc?.map((event, idx) => (
-        <>
+      {byDateDesc.map((event, idx) => (
+        <React.Fragment key={event.id || event.title}>
           <div
-            key={event.title}
             className={`SlideCard SlideCard--${
               index === idx ? "display" : "hide"
             }`}
           >
-            <img src={event.cover} alt="forum" />
+            <img src={event.cover} alt={event.title || "forum"} />
             <div className="SlideCard__descriptionContainer">
               <div className="SlideCard__description">
                 <h3>{event.title}</h3>
@@ -38,20 +41,23 @@ const Slider = () => {
               </div>
             </div>
           </div>
-          <div className="SlideCard__paginationContainer">
-            <div className="SlideCard__pagination">
-              {byDateDesc.map((_, radioIdx) => (
-                <input
-                  key={`${event.id}`}
-                  type="radio"
-                  name="radio-button"
-                  checked={idx === radioIdx}
-                />
-              ))}
-            </div>
-          </div>
-        </>
+        </React.Fragment>
       ))}
+
+      {/* 3) Pagination rendue UNE SEULE FOIS (plus dans chaque carte) */}
+      <div className="SlideCard__paginationContainer">
+        <div className="SlideCard__pagination">
+          {byDateDesc.map((event, radioIdx) => (
+            <input
+              key={`radio-${event.id || radioIdx}`}
+              type="radio"
+              name="radio-button"
+              checked={index === radioIdx}
+              readOnly
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
