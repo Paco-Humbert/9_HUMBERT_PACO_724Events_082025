@@ -1,57 +1,79 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useData } from "../../contexts/DataContext";
-import { getMonth } from "../../helpers/Date";
-
 import "./style.scss";
+
+// Parse robuste d'une date (accepte "YYYY-MM-DD" et ISO)
+const parseDate = (raw) => {
+  let t = Date.parse(raw);
+  if (!Number.isFinite(t)) {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) t = Date.parse(`${raw}T00:00:00Z`);
+  }
+  return Number.isFinite(t) ? new Date(t) : null;
+};
+
+// Mois FR (garde-fou si date invalide)
+const monthFR = (date) =>
+  date ? date.toLocaleString("fr-FR", { month: "long" }).toUpperCase() : "";
 
 const Slider = () => {
   const { data } = useData();
+
+  // Nettoyage + tri descendant + ne garder que 3 items
+  const items = (data?.focus ?? [])
+    .map((e) => {
+      const parsedDate = parseDate(e.date);
+      return parsedDate ? { ...e, parsedDate } : null; // on drop si date invalide
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.parsedDate - a.parsedDate)
+    .slice(0, 3);
+
   const [index, setIndex] = useState(0);
-  const byDateDesc = data?.focus.sort((evtA, evtB) =>
-    new Date(evtA.date) < new Date(evtB.date) ? -1 : 1
-  );
-  const nextCard = () => {
-    setTimeout(
-      () => setIndex(index < byDateDesc.length ? index + 1 : 0),
-      5000
-    );
-  };
+
+  // Si la longueur change, garder un index valide
   useEffect(() => {
-    nextCard();
-  });
+    if (index >= items.length) setIndex(0);
+  }, [items.length, index]);
+
+  // Auto-advance propre
+  useEffect(() => {
+    if (items.length === 0) return () => {};
+    const id = setTimeout(() => {
+      setIndex((i) => (i + 1) % items.length);
+    }, 5000);
+    return () => clearTimeout(id);
+  }, [index, items.length]);
+
   return (
     <div className="SlideCardList">
-      {byDateDesc?.map((event, idx) => (
-        <>
-          <div
-            key={event.title}
-            className={`SlideCard SlideCard--${
-              index === idx ? "display" : "hide"
-            }`}
-          >
-            <img src={event.cover} alt="forum" />
+      {items.map((event, idx) => (
+        <React.Fragment key={event.id || event.title}>
+          <div className={`SlideCard SlideCard--${index === idx ? "display" : "hide"}`}>
+            <img src={event.cover} alt={event.title || "visuel"} />
             <div className="SlideCard__descriptionContainer">
               <div className="SlideCard__description">
                 <h3>{event.title}</h3>
                 <p>{event.description}</p>
-                <div>{getMonth(new Date(event.date))}</div>
+                <div>{monthFR(event.parsedDate)}</div>
               </div>
             </div>
           </div>
-          <div className="SlideCard__paginationContainer">
-            <div className="SlideCard__pagination">
-              {byDateDesc.map((_, radioIdx) => (
-                <input
-                  key={`${event.id}`}
-                  type="radio"
-                  name="radio-button"
-                  checked={idx === radioIdx}
-                />
-              ))}
-            </div>
-          </div>
-        </>
+        </React.Fragment>
       ))}
+
+      <div className="SlideCard__paginationContainer">
+        <div className="SlideCard__pagination">
+          {items.map((event, radioIdx) => (
+            <input
+              key={`radio-${event.id || radioIdx}`}
+              type="radio"
+              name="radio-button"
+              checked={index === radioIdx}
+              readOnly
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
