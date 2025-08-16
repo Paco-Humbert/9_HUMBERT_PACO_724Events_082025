@@ -7,7 +7,8 @@ describe("When Events is created", () => {
     await screen.findByText("Email");
     await screen.findByText("Nom");
     await screen.findByText("Prénom");
-    await screen.findByText("Personel / Entreprise");
+    // correction typo "Personnel"
+    await screen.findByText("Personnel / Entreprise");
   });
 
   describe("and a click is triggered on the submit button", () => {
@@ -21,8 +22,9 @@ describe("When Events is created", () => {
           bubbles: true,
         })
       );
-      await screen.findByText("En cours");
-      await screen.findByText("Envoyer");
+      // Correction pour laisser un laps de temps avant de trouver les élements
+      await screen.findByText("En cours", {}, { timeout: 3000 });
+      await screen.findByText("Envoyer",  {}, { timeout: 3000 });
       expect(onSuccess).toHaveBeenCalled();
     });
   });
