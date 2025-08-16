@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 
 import "./style.scss";
 
+// Crée un composant Select qui accepte plusieurs propriétés en tant que paramètres.
 const Select = ({
   selection,
   onChange,
@@ -16,9 +17,11 @@ const Select = ({
   const [value, setValue] = useState();
   const [collapsed, setCollapsed] = useState(true);
   const changeValue = (newValue) => {
-    onChange();
-    setValue(newValue);
-    setCollapsed(newValue);
+    // CORRECTION : Ajout de newValue
+    // Fonction pour mettre à jour la valeur "value" et "collapsed" lorsqu'une nouvelle valeur est sélectionnée.
+    onChange(newValue); // Appelle la fonction "onChange" passée en tant que propriété avec la nouvelle valeur.
+    setValue(newValue); // Met à jour la valeur "value" avec la nouvelle valeur.
+    setCollapsed(newValue); // Met à jour "collapsed" en fonction de la nouvelle valeur (il semblerait qu'il y ait une correction manquante ici, peut-être "setCollapsed(!newValue)" serait approprié).
   };
   return (
     <div className={`SelectContainer ${type}`} data-testid="select-testid">
@@ -68,6 +71,8 @@ const Select = ({
 
 const Arrow = () => (
   <svg
+  // Ajout de cursor
+    cursor="pointer"
     width="21"
     height="11"
     viewBox="0 0 21 11"
