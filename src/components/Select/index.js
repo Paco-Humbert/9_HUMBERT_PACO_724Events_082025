@@ -21,7 +21,7 @@ const Select = ({
     // Fonction pour mettre à jour la valeur "value" et "collapsed" lorsqu'une nouvelle valeur est sélectionnée.
     onChange(newValue); // Appelle la fonction "onChange" passée en tant que propriété avec la nouvelle valeur.
     setValue(newValue); // Met à jour la valeur "value" avec la nouvelle valeur.
-    setCollapsed(newValue); // Met à jour "collapsed" en fonction de la nouvelle valeur (il semblerait qu'il y ait une correction manquante ici, peut-être "setCollapsed(!newValue)" serait approprié).
+    setCollapsed(true); // Met à jour "collapsed" en fonction de la nouvelle valeur 
   };
   return (
     <div className={`SelectContainer ${type}`} data-testid="select-testid">
