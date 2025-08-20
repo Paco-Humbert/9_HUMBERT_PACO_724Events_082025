@@ -14,7 +14,7 @@ import ModalEvent from "../../containers/ModalEvent";
 import { useData } from "../../contexts/DataContext";
 
 const Page = () => {
-  const { data } = useData(); // on utilise data, pas "last" depuis le context
+    const { data } = useData(); // on utilise data, pas "last" depuis le context
 
   // Dernier événement par date (ou null si aucun)
   const events = data?.events || [];
@@ -156,28 +156,26 @@ const Page = () => {
           <h3>Notre dernière prestation</h3>
           {renderLastEvent()}
         </div>
-
         <div className="col contact">
           <h3>Contactez-nous</h3>
           <address>45 avenue de la République, 75000 Paris</address>
           <div>01 23 45 67 89</div>
           <div>contact@724events.com</div>
           <div>
-            <a href="#twitch">
+            <a target="_blank" rel="noreferrer" href="https://www.twitch.tv/">
               <Icon name="twitch" />
             </a>
-            <a href="#facebook">
+            <a target="_blank" rel="noreferrer" href="https://www.facebook.com/">
               <Icon name="facebook" />
             </a>
-            <a href="#twitter">
+            <a target="_blank" rel="noreferrer" href="https://twitter.com/">
               <Icon name="twitter" />
             </a>
-            <a href="#youtube">
+            <a target="_blank" rel="noreferrer" href="https://www.youtube.com/">
               <Icon name="youtube" />
             </a>
           </div>
         </div>
-
         <div className="col description">
           <Logo size="large" />
           <p>
