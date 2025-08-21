@@ -45,6 +45,8 @@ const Slider = () => {
   }, [index, items.length]);
 
   return (
+    // React.Fragment sert à grouper plusieurs éléments sans créer de balise <div> supplémentaire.
+    // Ici il est utilisé pour pouvoir mettre une "key" sur l'élément retourné par le .map().
     <div className="SlideCardList">
       {items.map((event, idx) => (
         <React.Fragment key={event.id || event.title}>
@@ -59,16 +61,19 @@ const Slider = () => {
             </div>
           </div>
         </React.Fragment>
+      // Ajout de la fermeture du premier ".map"
       ))}
 
       <div className="SlideCard__paginationContainer">
         <div className="SlideCard__pagination">
           {items.map((event, radioIdx) => (
+          // {byDateDesc.map((_, radioIdx)
             <input
               key={`radio-${event.id || radioIdx}`}
               type="radio"
               name="radio-button"
               checked={index === radioIdx}
+              // checked={idx === radioIdx} correction idx => index
               readOnly
             />
           ))}

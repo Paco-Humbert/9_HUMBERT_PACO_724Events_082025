@@ -12,5 +12,5 @@ export const MONTHS = {
   11: "novembre",
   12: "décembre",
 };
-
-export const getMonth = (date) => MONTHS[date.getMonth()];
+// retourne un index de 0 à 11, donc +1 pour éviter le décalage, fix bug affichage 
+export const getMonth = (date) => MONTHS[date.getMonth() +1];
