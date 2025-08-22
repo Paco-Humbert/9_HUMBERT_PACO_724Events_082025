@@ -20,25 +20,40 @@ describe("When Form is created", () => {
           bubbles: true,
         })
       );
-      await screen.findByText("En cours");
-      await screen.findByText("Message envoyé !");
+      await screen.findByText("En cours", {}, { timeout: 3000 });
+      await screen.findByText("Message envoyé !", {}, { timeout: 3000 });
     });
   });
 
 });
 
-
+// Ajout de tests d'intégration
 describe("When a page is created", () => {
-  it("a list of events is displayed", () => {
-    // to implement
-  })
-  it("a list a people is displayed", () => {
-    // to implement
-  })
+  it("a list of events is displayed", async () => {
+    const { container } = render(<Home />);
+    const nosReal = container.querySelector("#realisationTitle");
+    expect(nosReal.innerHTML).toEqual("Nos réalisations");
+    const events = container.querySelector("#events");
+    expect(events).toBeInTheDocument();
+  });
+
+  it("a list a people is displayed", async () => {
+    render(<Home />);
+    await screen.findByText("CEO");
+    await screen.findByText("Alice");
+    await screen.findByText("Isabelle");
+  });
+
   it("a footer is displayed", () => {
-    // to implement
-  })
-  it("an event card, with the last event, is displayed", () => {
-    // to implement
-  })
+    render(<Home />);
+    const footer = screen.getByTestId("footer");
+    expect(footer).toBeInTheDocument();
+  });
+
+  it("an event card, with the last event, is displayed", async () => {
+    render(<Home />);
+    const eventCard = await screen.findByTestId("event-card");
+    expect(eventCard).toBeInTheDocument();
+    expect(eventCard).toHaveTextContent("User&product MixUsers");
+  });
 });
