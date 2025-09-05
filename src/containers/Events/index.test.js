@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+// src/containers/Events/index.test.js
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { api, DataProvider } from "../../contexts/DataContext";
 import Events from "./index";
 
@@ -21,7 +22,6 @@ const data = {
         "1 site web dédié",
       ],
     },
-
     {
       id: 2,
       type: "forum",
@@ -45,43 +45,45 @@ describe("When Events is created", () => {
         <Events />
       </DataProvider>
     );
-    await screen.findByText("avril");
+    // Il y a plusieurs "avril" -> on utilise findAll et on asserte la longueur
+    const months = await screen.findAllByText(/avril/i);
+    expect(months.length).toBeGreaterThan(0); 
   });
+
   describe("and an error occured", () => {
     it("an error message is displayed", async () => {
-      api.loadData = jest.fn().mockRejectedValue();
+      // Rejete la promesse 
+      api.loadData = jest.fn().mockRejectedValueOnce(new Error("boom"));
       render(
         <DataProvider>
           <Events />
         </DataProvider>
       );
-      expect(await screen.findByText("An error occured")).toBeInTheDocument();
+      // Attendre que l'état erreur remplace "loading"
+      await waitFor(() =>
+        expect(screen.getByText(/an error occured/i)).toBeInTheDocument()
+      );
     });
   });
+
   describe("and we select a category", () => {
-    it.only("an filtered list is displayed", async () => {
+    it("an filtered list is displayed", async () => {
       api.loadData = jest.fn().mockReturnValue(data);
       render(
         <DataProvider>
           <Events />
         </DataProvider>
       );
-      await screen.findByText("Forum #productCON");
-      fireEvent(
-        await screen.findByTestId("collapse-button-testid"),
-        new MouseEvent("click", {
-          cancelable: true,
-          bubbles: true,
-        })
-      );
-      fireEvent(
-        (await screen.findAllByText("soirée entreprise"))[0],
-        new MouseEvent("click", {
-          cancelable: true,
-          bubbles: true,
-        })
-      );
 
+      await screen.findByText("Forum #productCON"); // état initial visible
+
+      // Ouvrir le select
+      fireEvent.click(await screen.findByTestId("collapse-button-testid"));
+
+      // Choisir "soirée entreprise"
+      fireEvent.click((await screen.findAllByText(/soirée entreprise/i))[0]);
+
+      // Vérifier le filtrage
       await screen.findByText("Conférence #productCON");
       expect(screen.queryByText("Forum #productCON")).not.toBeInTheDocument();
     });
@@ -96,14 +98,10 @@ describe("When Events is created", () => {
         </DataProvider>
       );
 
-      fireEvent(
-        await screen.findByText("Conférence #productCON"),
-        new MouseEvent("click", {
-          cancelable: true,
-          bubbles: true,
-        })
-      );
+      // Ouvrir la modale via clic sur la carte
+      fireEvent.click(await screen.findByText("Conférence #productCON"));
 
+      // Détails visibles
       await screen.findByText("24-25-26 Février");
       await screen.findByText("1 site web dédié");
     });
