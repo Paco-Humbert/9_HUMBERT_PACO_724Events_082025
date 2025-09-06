@@ -46,7 +46,7 @@ const Slider = () => {
 
   return (
     // React.Fragment sert à grouper plusieurs éléments sans créer de balise <div> supplémentaire.
-    // Ici il est utilisé pour pouvoir mettre une "key" sur l'élément retourné par le .map().
+    // Utilisé pour pouvoir mettre une "key" sur l'élément retourné par le .map().
     <div className="SlideCardList">
       {items.map((event, idx) => (
         <React.Fragment key={event.id || event.title}>
